@@ -6,7 +6,7 @@
 package main
 
 import (
-	"github.com/sfpprxy/noop/log"
+	"github.com/patsnapops/noop/log"
 )
 
 func main() {
