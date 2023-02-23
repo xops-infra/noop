@@ -26,6 +26,10 @@ func Fatal(msg string, fields ...zap.Field) {
 	zapLogger.Fatal(msg, fields...)
 }
 
+func Panic(msg string, fields ...zap.Field) {
+	zapLogger.Panic(msg, fields...)
+}
+
 func Debugf(template string, args ...any) {
 	zapLogger.Sugar().Debugf(template, args...)
 }
@@ -44,6 +48,10 @@ func Errorf(template string, args ...any) {
 
 func Fatalf(template string, args ...any) {
 	zapLogger.Sugar().Fatalf(template, args...)
+}
+
+func Panicf(template string, args ...any) {
+	zapLogger.Sugar().Panicf(template, args...)
 }
 
 // not providing Xxxw such as Infow since structured logging should be typed, which Xxxw require reflect
