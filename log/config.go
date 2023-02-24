@@ -46,7 +46,12 @@ func (c *Config) Init() {
 	)
 
 	core := zapcore.NewTee(consoleCore, fileCore)
-	zapLogger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel))
+	zapLogger = zap.New(
+		core,
+		zap.AddCaller(),
+		zap.AddCallerSkip(1),
+		zap.AddStacktrace(zap.ErrorLevel),
+	)
 	zapLogger.Info("zap logger initialized")
 	zapLogger.Debug("zap logger debug level enabled")
 }
