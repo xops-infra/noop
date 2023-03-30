@@ -15,13 +15,14 @@ const DefaultFilename = "./app.log"
 type Config struct {
 	stdoutConfig  *StdoutConfig
 	rollingConfig *FileConfig
-	level         zapcore.Level
 }
 
 type StdoutConfig struct {
+	level Level
 }
 
 type FileConfig struct {
+	level    Level
 	encoding zapcore.EncoderConfig
 	logger   *lumberjack.Logger
 }
@@ -32,7 +33,7 @@ func (c *Config) Init() {
 	consoleCore := zapcore.NewCore(
 		zapcore.NewConsoleEncoder(consoleEncoder),
 		zapcore.AddSync(zapcore.Lock(os.Stdout)),
-		c.level,
+		zapcore.Level(c.stdoutConfig.level),
 	)
 
 	fileWriter := zapcore.AddSync(&lumberjack.Logger{
@@ -43,7 +44,7 @@ func (c *Config) Init() {
 	fileCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.AddSync(fileWriter),
-		c.level,
+		zapcore.Level(c.rollingConfig.level),
 	)
 
 	core := zapcore.NewTee(consoleCore, fileCore)
@@ -75,7 +76,8 @@ func (c *Config) WithFilename(filename string) *Config {
 	return c
 }
 
-func (c *Config) WithLevel(level zapcore.Level) *Config {
-	c.level = level
+func (c *Config) WithLevel(level Level) *Config {
+	c.stdoutConfig.level = level
+	c.rollingConfig.level = level
 	return c
 }

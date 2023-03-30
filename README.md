@@ -7,14 +7,13 @@ package main
 
 import (
 	"github.com/patsnapops/noop/log"
-	"go.uber.org/zap/zapcore"
 )
 
 func main() {
 	// set with filename
 	// log.Default().WithFilename("app.log").Init()
 	// set debug level
-	log.Default().WithFilename("app.log").WithLevel(zapcore.DebugLevel).Init()
+	log.Default().WithFilename("app.log").WithLevel(DebugLevel).Init()
 	// or just
 	// log.Default().Init()
 
@@ -25,7 +24,7 @@ func main() {
 }
 ```
 
-output like
+Output:
 ```bash
 [root@linux noop]# go run main.go 
 2023-03-24T11:22:13.071+0800    INFO    noop/main.go:9  zap logger initialized
