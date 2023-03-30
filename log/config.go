@@ -60,6 +60,9 @@ func (c *Config) Init() {
 
 func Default() *Config {
 	return &Config{
+		stdoutConfig: &StdoutConfig{
+			level: DebugLevel,
+		},
 		rollingConfig: &FileConfig{
 			encoding: zapcore.EncoderConfig{},
 			logger: &lumberjack.Logger{
