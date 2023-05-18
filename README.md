@@ -74,4 +74,16 @@ main.main
 runtime.main
         /opt/homebrew/opt/go/libexec/src/runtime/proc.go:250
 2023-05-19T00:36:25.652+0800    INFO    noop/main.go:30 this is an info level log with string fmt       {"instance_id": "1135286d-2fa7-4715-8b90-4937c0e49c2d", "localtime": "2023-05-19 00:36:25.652"}
+
+# with human time
+[root@linux noop]# go run main.go
+2023-05-19T00:44:31.998+0800    DEBUG   noop/main.go:28 this is a simple debugging log  {"human_time": "2023-05-19 00:44:31.998"}
+2023-05-19T00:44:31.998+0800    WARN    noop/main.go:29 this is a warning log with string fmt   {"human_time": "2023-05-19 00:44:31.998"}
+2023-05-19T00:44:31.998+0800    ERROR   noop/main.go:30 this is an error level log with string fmt      {"human_time": "2023-05-19 00:44:31.998"}
+main.main
+        /Users/longyao/GolangWorkspace/MyselfProjects/noop/main.go:30
+runtime.main
+        /opt/homebrew/opt/go/libexec/src/runtime/proc.go:250
+2023-05-19T00:44:31.998+0800    INFO    noop/main.go:31 this is an info level log with string fmt       {"human_time": "2023-05-19 00:44:31.998"}
+
 ```
