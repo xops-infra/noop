@@ -1,7 +1,12 @@
 package log
 
 import (
+	"fmt"
 	"os"
+	"path"
+	"path/filepath"
+	"strings"
+	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -76,7 +81,7 @@ func Default() *Config {
 		rollingConfig: &FileConfig{
 			encoding: zapcore.EncoderConfig{},
 			logger: &lumberjack.Logger{
-				Filename: DefaultFilename,
+				Filename: getLogFilename(DefaultFilename),
 				MaxSize:  500, // megabytes
 				MaxAge:   30,  // days
 			},
@@ -99,4 +104,15 @@ func (c *Config) WithLevel(level Level) *Config {
 func (c *Config) WithFields(fields []zapcore.Field) *Config {
 	c.fieldsConfig.fields = fields
 	return c
+}
+
+func getLogFilename(rawFilename string) string {
+	if rawFilename == "" {
+		return rawFilename
+	}
+	filename := filepath.Base(rawFilename)
+	suffix := path.Ext(filename)
+	filenameOnly := strings.TrimSuffix(filename, suffix)
+	filenameOnly = fmt.Sprintf(filenameOnly+"_%v", time.Now().In(time.Local).Format("2006-01-01"))
+	return strings.ReplaceAll(rawFilename, filename, filenameOnly+suffix)
 }
