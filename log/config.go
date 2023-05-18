@@ -34,7 +34,7 @@ type FileConfig struct {
 }
 
 type FieldsConfig struct {
-	fields []zapcore.Field
+	fields map[string]interface{}
 }
 
 func (c *Config) Init() {
@@ -58,8 +58,8 @@ func (c *Config) Init() {
 	)
 
 	if c.fieldsConfig.fields != nil || len(c.fieldsConfig.fields) != 0 {
-		consoleCore = consoleCore.With(c.fieldsConfig.fields)
-		fileCore = fileCore.With(c.fieldsConfig.fields)
+		consoleCore = consoleCore.With(c.transformFields())
+		fileCore = fileCore.With(c.transformFields())
 	}
 
 	core := zapcore.NewTee(consoleCore, fileCore)
@@ -101,7 +101,7 @@ func (c *Config) WithLevel(level Level) *Config {
 	return c
 }
 
-func (c *Config) WithFields(fields []zapcore.Field) *Config {
+func (c *Config) WithFields(fields map[string]interface{}) *Config {
 	c.fieldsConfig.fields = fields
 	return c
 }
@@ -115,4 +115,12 @@ func getLogFilename(rawFilename string) string {
 	filenameOnly := strings.TrimSuffix(filename, suffix)
 	filenameOnly = fmt.Sprintf(filenameOnly+"_%v", time.Now().In(time.Local).Format("2006-01-01"))
 	return strings.ReplaceAll(rawFilename, filename, filenameOnly+suffix)
+}
+
+func (c *Config) transformFields() []zapcore.Field {
+	var zapFields []zapcore.Field
+	for k, v := range c.fieldsConfig.fields {
+		zapFields = append(zapFields, zap.Any(k, v))
+	}
+	return zapFields
 }
