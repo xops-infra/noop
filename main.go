@@ -2,14 +2,13 @@ package main
 
 import (
 	"github.com/patsnapops/noop/log"
-	"go.uber.org/zap/zapcore"
 )
 
 func main() {
 	// set with filename
 	// log.Default().WithFilename("app.log").Init()
 	// set debug level
-	log.Default().WithFilename("app.log").WithLevel(zapcore.DebugLevel).Init()
+	log.Default().WithFilename("app.log").WithLevel(log.DebugLevel).Init()
 	// or just
 	// log.Default().Init()
 
