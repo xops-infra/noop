@@ -106,6 +106,16 @@ func (c *Config) WithFields(fields map[string]interface{}) *Config {
 	return c
 }
 
+func (c *Config) WithHumanTime(location *time.Location) *Config {
+	if location == nil {
+		location = time.Local
+	}
+	c.WithFields(map[string]interface{}{
+		"human_time": time.Now().In(location).Format("2006-01-02 15:04:05.000"),
+	})
+	return c
+}
+
 func getLogFilename(rawFilename string) string {
 	if rawFilename == "" {
 		return rawFilename

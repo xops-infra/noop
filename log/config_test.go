@@ -20,3 +20,9 @@ func TestConfig_WithFields(t *testing.T) {
 	Debug("this is a debug message with fields")
 	Info("this is a info message with fields")
 }
+
+func TestConfig_WithHumanTime(t *testing.T) {
+	Default().WithFilename("app.log").WithLevel(DebugLevel).WithHumanTime(time.Local).Init()
+	Debug("this is a debug message with human time")
+	Info("this is a info message with human time")
+}

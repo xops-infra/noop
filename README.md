@@ -21,19 +21,13 @@ func main() {
 	// set debug level
 	// log.Default().WithFilename("app.log").WithLevel(log.DebugLevel).Init()
 
-	// set fields
-	log.Default().WithFilename("app.log").WithLevel(log.DebugLevel).WithFields([]zap.Field{
-		{
-			Key:    "xx_key",
-			Type:   zapcore.StringType,
-			String: "filed_value",
-		},
-		{
-			Key:    "LocalTime",
-			Type:   zapcore.StringType,
-			String: time.Now().In(time.Local).Format("2006-01-02 15:04:05.000"),
-		},
-	}).Init()
+	// set fields, which will be printed in the log, the fields is a map,
+	// key is the field name, value is the field value, the value can be any type, example:
+	fields := map[string]interface{}{
+		"instance_id": "1135286d-2fa7-4715-8b90-4937c0e49c2d",
+		"localtime":   time.Now().In(time.Local).Format("2006-01-02 15:04:05.000"),
+	}
+	log.Default().WithFilename("app.log").WithLevel(log.DebugLevel).WithFields(fields).Init()
 
 	// or just
 	// log.Default().Init()
@@ -72,13 +66,12 @@ runtime.main
 
 # with fields
 [root@linux noop]# go run main.go 
-2023-05-18T16:23:23.806+0800    DEBUG   noop/main.go:35 this is a simple debugging log  {"xx_key": "filed_value", "LocalTime": "2023-05-18 16:23:23.806"}
-2023-05-18T16:23:23.807+0800    WARN    noop/main.go:36 this is a warning log with string fmt   {"xx_key": "filed_value", "LocalTime": "2023-05-18 16:23:23.806"}
-2023-05-18T16:23:23.807+0800    ERROR   noop/main.go:37 this is an error level log with string fmt      {"xx_key": "filed_value", "LocalTime": "2023-05-18 16:23:23.806"}
+2023-05-19T00:36:25.652+0800    DEBUG   noop/main.go:27 this is a simple debugging log  {"instance_id": "1135286d-2fa7-4715-8b90-4937c0e49c2d", "localtime": "2023-05-19 00:36:25.652"}
+2023-05-19T00:36:25.652+0800    WARN    noop/main.go:28 this is a warning log with string fmt   {"instance_id": "1135286d-2fa7-4715-8b90-4937c0e49c2d", "localtime": "2023-05-19 00:36:25.652"}
+2023-05-19T00:36:25.652+0800    ERROR   noop/main.go:29 this is an error level log with string fmt      {"instance_id": "1135286d-2fa7-4715-8b90-4937c0e49c2d", "localtime": "2023-05-19 00:36:25.652"}
 main.main
-        /Users/yao/GoLangWorkspace/MyselfProjects/github/noop/main.go:37
+        /Users/longyao/GolangWorkspace/MyselfProjects/noop/main.go:29
 runtime.main
-        /opt/homebrew/Cellar/go/1.20.3/libexec/src/runtime/proc.go:250
-2023-05-18T16:23:23.807+0800    INFO    noop/main.go:38 this is an info level log with string fmt       {"xx_key": "filed_value", "LocalTime": "2023-05-18 16:23:23.806"}
-
+        /opt/homebrew/opt/go/libexec/src/runtime/proc.go:250
+2023-05-19T00:36:25.652+0800    INFO    noop/main.go:30 this is an info level log with string fmt       {"instance_id": "1135286d-2fa7-4715-8b90-4937c0e49c2d", "localtime": "2023-05-19 00:36:25.652"}
 ```
