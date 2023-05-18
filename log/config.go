@@ -1,7 +1,12 @@
 package log
 
 import (
+	"fmt"
 	"os"
+	"path"
+	"path/filepath"
+	"strings"
+	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -15,6 +20,7 @@ const DefaultFilename = "./app.log"
 type Config struct {
 	stdoutConfig  *StdoutConfig
 	rollingConfig *FileConfig
+	fieldsConfig  *FieldsConfig
 }
 
 type StdoutConfig struct {
@@ -25,6 +31,10 @@ type FileConfig struct {
 	level    Level
 	encoding zapcore.EncoderConfig
 	logger   *lumberjack.Logger
+}
+
+type FieldsConfig struct {
+	fields []zapcore.Field
 }
 
 func (c *Config) Init() {
@@ -47,6 +57,11 @@ func (c *Config) Init() {
 		zapcore.Level(c.rollingConfig.level),
 	)
 
+	if c.fieldsConfig.fields != nil || len(c.fieldsConfig.fields) != 0 {
+		consoleCore = consoleCore.With(c.fieldsConfig.fields)
+		fileCore = fileCore.With(c.fieldsConfig.fields)
+	}
+
 	core := zapcore.NewTee(consoleCore, fileCore)
 	zapLogger = zap.New(
 		core,
@@ -54,8 +69,8 @@ func (c *Config) Init() {
 		zap.AddCallerSkip(1),
 		zap.AddStacktrace(zap.ErrorLevel),
 	)
-	zapLogger.Info("zap logger initialized")
-	zapLogger.Debug("zap logger debug level enabled")
+	// zapLogger.Info("zap logger initialized")
+	// zapLogger.Debug("zap logger debug level enabled")
 }
 
 func Default() *Config {
@@ -66,11 +81,12 @@ func Default() *Config {
 		rollingConfig: &FileConfig{
 			encoding: zapcore.EncoderConfig{},
 			logger: &lumberjack.Logger{
-				Filename: DefaultFilename,
+				Filename: getLogFilename(DefaultFilename),
 				MaxSize:  500, // megabytes
 				MaxAge:   30,  // days
 			},
 		},
+		fieldsConfig: &FieldsConfig{},
 	}
 }
 
@@ -83,4 +99,20 @@ func (c *Config) WithLevel(level Level) *Config {
 	c.stdoutConfig.level = level
 	c.rollingConfig.level = level
 	return c
+}
+
+func (c *Config) WithFields(fields []zapcore.Field) *Config {
+	c.fieldsConfig.fields = fields
+	return c
+}
+
+func getLogFilename(rawFilename string) string {
+	if rawFilename == "" {
+		return rawFilename
+	}
+	filename := filepath.Base(rawFilename)
+	suffix := path.Ext(filename)
+	filenameOnly := strings.TrimSuffix(filename, suffix)
+	filenameOnly = fmt.Sprintf(filenameOnly+"_%v", time.Now().In(time.Local).Format("2006-01-01"))
+	return strings.ReplaceAll(rawFilename, filename, filenameOnly+suffix)
 }
