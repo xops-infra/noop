@@ -15,6 +15,7 @@ const DefaultFilename = "./app.log"
 type Config struct {
 	stdoutConfig  *StdoutConfig
 	rollingConfig *FileConfig
+	fieldsConfig  *FieldsConfig
 }
 
 type StdoutConfig struct {
@@ -25,6 +26,10 @@ type FileConfig struct {
 	level    Level
 	encoding zapcore.EncoderConfig
 	logger   *lumberjack.Logger
+}
+
+type FieldsConfig struct {
+	fields []zapcore.Field
 }
 
 func (c *Config) Init() {
@@ -47,6 +52,11 @@ func (c *Config) Init() {
 		zapcore.Level(c.rollingConfig.level),
 	)
 
+	if c.fieldsConfig.fields != nil || len(c.fieldsConfig.fields) != 0 {
+		consoleCore = consoleCore.With(c.fieldsConfig.fields)
+		fileCore = fileCore.With(c.fieldsConfig.fields)
+	}
+
 	core := zapcore.NewTee(consoleCore, fileCore)
 	zapLogger = zap.New(
 		core,
@@ -54,8 +64,8 @@ func (c *Config) Init() {
 		zap.AddCallerSkip(1),
 		zap.AddStacktrace(zap.ErrorLevel),
 	)
-	zapLogger.Info("zap logger initialized")
-	zapLogger.Debug("zap logger debug level enabled")
+	// zapLogger.Info("zap logger initialized")
+	// zapLogger.Debug("zap logger debug level enabled")
 }
 
 func Default() *Config {
@@ -71,6 +81,7 @@ func Default() *Config {
 				MaxAge:   30,  // days
 			},
 		},
+		fieldsConfig: &FieldsConfig{},
 	}
 }
 
@@ -82,5 +93,10 @@ func (c *Config) WithFilename(filename string) *Config {
 func (c *Config) WithLevel(level Level) *Config {
 	c.stdoutConfig.level = level
 	c.rollingConfig.level = level
+	return c
+}
+
+func (c *Config) WithFields(fields []zapcore.Field) *Config {
+	c.fieldsConfig.fields = fields
 	return c
 }
