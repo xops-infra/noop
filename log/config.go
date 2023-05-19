@@ -34,7 +34,7 @@ type FileConfig struct {
 }
 
 type FieldsConfig struct {
-	fields map[string]interface{}
+	fields map[string]any
 }
 
 func (c *Config) Init() {
@@ -101,7 +101,7 @@ func (c *Config) WithLevel(level Level) *Config {
 	return c
 }
 
-func (c *Config) WithFields(fields map[string]interface{}) *Config {
+func (c *Config) WithFields(fields map[string]any) *Config {
 	c.fieldsConfig.fields = fields
 	return c
 }
@@ -110,7 +110,7 @@ func (c *Config) WithHumanTime(location *time.Location) *Config {
 	if location == nil {
 		location = time.Local
 	}
-	c.WithFields(map[string]interface{}{
+	c.WithFields(map[string]any{
 		"human_time": time.Now().In(location).Format("2006-01-02 15:04:05.000"),
 	})
 	return c
