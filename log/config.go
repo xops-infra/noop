@@ -123,7 +123,7 @@ func getLogFilename(rawFilename string) string {
 	filename := filepath.Base(rawFilename)
 	suffix := path.Ext(filename)
 	filenameOnly := strings.TrimSuffix(filename, suffix)
-	filenameOnly = fmt.Sprintf(filenameOnly+"_%v", time.Now().In(time.Local).Format("2006-01-01"))
+	filenameOnly = fmt.Sprintf(filenameOnly + "_" + time.Now().In(time.Local).Format("2006-01-02"))
 	return strings.ReplaceAll(rawFilename, filename, filenameOnly+suffix)
 }
 
