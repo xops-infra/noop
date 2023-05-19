@@ -16,6 +16,7 @@ import (
 var zapLogger *zap.Logger
 
 const DefaultFilename = "./app.log"
+const HumanTime = "human_time"
 
 type Config struct {
 	stdoutConfig  *StdoutConfig
@@ -58,7 +59,6 @@ func (c *Config) Init() {
 	)
 
 	if c.fieldsConfig.fields != nil || len(c.fieldsConfig.fields) != 0 {
-		consoleCore = consoleCore.With(c.transformFields())
 		fileCore = fileCore.With(c.transformFields())
 	}
 
@@ -111,7 +111,7 @@ func (c *Config) WithHumanTime(location *time.Location) *Config {
 		location = time.Local
 	}
 	c.WithFields(map[string]any{
-		"human_time": time.Now().In(location).Format("2006-01-02 15:04:05.000"),
+		HumanTime: time.Now().In(location).Format("2006-01-02 15:04:05.000"),
 	})
 	return c
 }
