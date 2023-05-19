@@ -16,6 +16,7 @@ import (
 var zapLogger *zap.Logger
 
 const DefaultFilename = "./app.log"
+const HumanTime = "human_time"
 
 type Config struct {
 	stdoutConfig  *StdoutConfig
@@ -34,7 +35,7 @@ type FileConfig struct {
 }
 
 type FieldsConfig struct {
-	fields map[string]interface{}
+	fields map[string]any
 }
 
 func (c *Config) Init() {
@@ -58,7 +59,6 @@ func (c *Config) Init() {
 	)
 
 	if c.fieldsConfig.fields != nil || len(c.fieldsConfig.fields) != 0 {
-		consoleCore = consoleCore.With(c.transformFields())
 		fileCore = fileCore.With(c.transformFields())
 	}
 
@@ -101,7 +101,7 @@ func (c *Config) WithLevel(level Level) *Config {
 	return c
 }
 
-func (c *Config) WithFields(fields map[string]interface{}) *Config {
+func (c *Config) WithFields(fields map[string]any) *Config {
 	c.fieldsConfig.fields = fields
 	return c
 }
@@ -110,8 +110,8 @@ func (c *Config) WithHumanTime(location *time.Location) *Config {
 	if location == nil {
 		location = time.Local
 	}
-	c.WithFields(map[string]interface{}{
-		"human_time": time.Now().In(location).Format("2006-01-02 15:04:05.000"),
+	c.WithFields(map[string]any{
+		HumanTime: time.Now().In(location).Format("2006-01-02 15:04:05.000"),
 	})
 	return c
 }
@@ -123,7 +123,7 @@ func getLogFilename(rawFilename string) string {
 	filename := filepath.Base(rawFilename)
 	suffix := path.Ext(filename)
 	filenameOnly := strings.TrimSuffix(filename, suffix)
-	filenameOnly = fmt.Sprintf(filenameOnly+"_%v", time.Now().In(time.Local).Format("2006-01-01"))
+	filenameOnly = fmt.Sprintf(filenameOnly + "_" + time.Now().In(time.Local).Format("2006-01-02"))
 	return strings.ReplaceAll(rawFilename, filename, filenameOnly+suffix)
 }
 

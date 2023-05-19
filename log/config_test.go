@@ -12,7 +12,7 @@ func TestInit(t *testing.T) {
 }
 
 func TestConfig_WithFields(t *testing.T) {
-	fields := map[string]interface{}{
+	fields := map[string]any{
 		"instance_id": "1135286d-2fa7-4715-8b90-4937c0e49c2d",
 		"localtime":   time.Now().In(time.Local).Format("2006-01-02 15:04:05.000"),
 	}
