@@ -102,7 +102,7 @@ func (c *Config) WithLevel(level Level) *Config {
 }
 
 func (c *Config) WithFields(fields map[string]any) *Config {
-	c.fieldsConfig.fields = fields
+	c.addFields(fields)
 	return c
 }
 
@@ -110,10 +110,9 @@ func (c *Config) WithHumanTime(location *time.Location) *Config {
 	if location == nil {
 		location = time.Local
 	}
-	if c.fieldsConfig.fields == nil {
-		c.fieldsConfig.fields = make(map[string]any)
-	}
-	c.fieldsConfig.fields[HumanTime] = time.Now().In(location).Format("2006-01-02 15:04:05.000")
+	c.addFields(map[string]any{
+		HumanTime: time.Now().In(location).Format("2006-01-02 15:04:05.000"),
+	})
 	return c
 }
 
@@ -134,4 +133,14 @@ func (c *Config) transformFields() []zapcore.Field {
 		zapFields = append(zapFields, zap.Any(k, v))
 	}
 	return zapFields
+}
+
+func (c *Config) addFields(fields map[string]any) {
+	if c.fieldsConfig.fields == nil {
+		c.fieldsConfig.fields = make(map[string]any)
+	}
+
+	for k, v := range fields {
+		c.fieldsConfig.fields[k] = v
+	}
 }
