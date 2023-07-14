@@ -16,7 +16,7 @@ import (
 var zapLogger *zap.Logger
 
 const DefaultFilename = "./app.log"
-const HumanTime = "human_time"
+const HumanTime = "_human_time"
 
 type Config struct {
 	stdoutConfig  *StdoutConfig
@@ -52,8 +52,15 @@ func (c *Config) Init() {
 		MaxSize:  c.rollingConfig.logger.MaxSize, // megabytes
 		MaxAge:   c.rollingConfig.logger.MaxAge,  // days
 	})
+	fileEncoder := zap.NewProductionEncoderConfig()
+	if timeLocation, ok := c.fieldsConfig.fields[HumanTime]; ok {
+		fileEncoder.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+			enc.AppendString(t.In(timeLocation.(*time.Location)).Format("2006-01-02 15:04:05.000"))
+		}
+		delete(c.fieldsConfig.fields, HumanTime)
+	}
 	fileCore := zapcore.NewCore(
-		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+		zapcore.NewJSONEncoder(fileEncoder),
 		zapcore.AddSync(fileWriter),
 		zapcore.Level(c.rollingConfig.level),
 	)
@@ -111,7 +118,7 @@ func (c *Config) WithHumanTime(location *time.Location) *Config {
 		location = time.Local
 	}
 	c.addFields(map[string]any{
-		HumanTime: time.Now().In(location).Format("2006-01-02 15:04:05.000"),
+		HumanTime: location,
 	})
 	return c
 }
