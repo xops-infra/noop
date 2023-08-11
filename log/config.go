@@ -65,7 +65,7 @@ func (c *Config) Init() {
 		zapcore.Level(c.rollingConfig.level),
 	)
 
-	if c.fieldsConfig.fields != nil || len(c.fieldsConfig.fields) != 0 {
+	if c.fieldsConfig.fields != nil && len(c.fieldsConfig.fields) != 0 {
 		fileCore = fileCore.With(c.transformFields())
 	}
 
