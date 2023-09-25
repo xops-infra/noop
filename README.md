@@ -25,7 +25,14 @@ func main() {
 	// log.Default().WithFilename("app.log").WithLevel(log.DebugLevel).WithFields(fields).Init()
 
 	// set human time, which will be printed in the log, default is local time, example:
-	log.Default().WithHumanTime(nil).Init()
+	// log.Default().WithHumanTime(nil).Init()
+
+	// print warn and higher level logs to the warn level log file.
+	log.Default().WithWarnLog("").Init()
+	// print error and higher level logs to the error level log file.
+	log.Default().WithErrorLog("").Init()
+	// print warn level logs to the warn level log file, print error and higher level logs to the error level log file
+	log.Default().WithWarnLog("").WithErrorLog("").Init()
 
 	// or just
 	// log.Default().Init()
@@ -83,5 +90,16 @@ main.main
 runtime.main
         /opt/homebrew/opt/go/libexec/src/runtime/proc.go:250
 2023-05-19T00:44:31.998+0800    INFO    noop/main.go:31 this is an info level log with string fmt       {"human_time": "2023-05-19 00:44:31.998"}
+
+# with log level filter
+[root@linux noop]# go run main.go
+2023-09-26T01:47:48.953+0800    DEBUG   noop/main.go:35 this is a simple debugging log
+2023-09-26T01:47:48.954+0800    WARN    noop/main.go:36 this is a warning log with string fmt
+2023-09-26T01:47:48.954+0800    ERROR   noop/main.go:37 this is an error level log with string fmt
+main.main
+        /Users/longyao/GolangWorkspace/github/noop/main.go:37
+runtime.main
+        /opt/homebrew/opt/go/libexec/src/runtime/proc.go:250
+2023-09-26T01:47:48.954+0800    INFO    noop/main.go:38 this is an info level log with string fmt
 
 ```
