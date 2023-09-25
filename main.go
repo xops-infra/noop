@@ -20,7 +20,14 @@ func main() {
 	// log.Default().WithFilename("app.log").WithLevel(log.DebugLevel).WithFields(fields).Init()
 
 	// set human time, which will be printed in the log, default is local time, example:
-	log.Default().WithHumanTime(nil).Init()
+	// log.Default().WithHumanTime(nil).Init()
+
+	// print warn and higher level logs to the warn level log file.
+	log.Default().WithWarnLog("").Init()
+	// print error and higher level logs to the error level log file.
+	log.Default().WithErrorLog("").Init()
+	// print warn level logs to the warn level log file, print error and higher level logs to the error level log file
+	log.Default().WithWarnLog("").WithErrorLog("").Init()
 
 	// or just
 	// log.Default().Init()

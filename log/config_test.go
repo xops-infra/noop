@@ -26,3 +26,33 @@ func TestConfig_WithHumanTime(t *testing.T) {
 	Debug("this is a debug message with human time")
 	Info("this is a info message with human time")
 }
+
+func TestConfig_WithoutLevelFilterLog(t *testing.T) {
+	TestConfig_WithHumanTime(t)
+	Warn("this is a warn message")
+	Error("this is a error message")
+}
+
+func TestConfig_WithWarnLog(t *testing.T) {
+	Default().WithHumanTime(nil).WithWarnLog("").Init()
+	Debug("this is a debug message")
+	Info("this is a info message")
+	Warn("this is a warn message")
+	Error("this is a error message")
+}
+
+func TestConfig_WithErrorLog(t *testing.T) {
+	Default().WithHumanTime(nil).WithErrorLog("").Init()
+	Debug("this is a debug message")
+	Info("this is a info message")
+	Warn("this is a warn message")
+	Error("this is a error message")
+}
+
+func TestConfig_WithWarnAndErrorLog(t *testing.T) {
+	Default().WithHumanTime(nil).WithErrorLog("").WithWarnLog("").Init()
+	Debug("this is a debug message")
+	Info("this is a info message")
+	Warn("this is a warn message")
+	Error("this is a error message")
+}
