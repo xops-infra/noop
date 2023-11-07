@@ -1,4 +1,4 @@
-module github.com/patsnapops/noop
+module github.com/xops-infra/noop
 
 go 1.19
 
