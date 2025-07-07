@@ -13,10 +13,16 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var zapLogger *zap.Logger
+var defaultLogger *Logger
 
 const DefaultFilename = "./app.log"
 const HumanTime = "_human_time"
+
+// Logger 暴露的日志器结构体
+type Logger struct {
+	zapLogger *zap.Logger
+	config    *Config
+}
 
 type Config struct {
 	stdoutConfig          *StdoutConfig
@@ -46,7 +52,7 @@ type LevelFilterFileConfig struct {
 	errorLogFilename string
 }
 
-func (c *Config) Init() {
+func (c *Config) Init() *Logger {
 	var cores []zapcore.Core
 	consoleEncoder := zap.NewDevelopmentEncoderConfig()
 	consoleEncoder.EncodeLevel = zapcore.CapitalColorLevelEncoder
@@ -82,14 +88,43 @@ func (c *Config) Init() {
 	}
 
 	core := zapcore.NewTee(cores...)
-	zapLogger = zap.New(
+	zapLogger := zap.New(
 		core,
 		zap.AddCaller(),
 		zap.AddCallerSkip(1),
 		zap.AddStacktrace(zap.ErrorLevel),
 	)
-	// zapLogger.Info("zap logger initialized")
-	// zapLogger.Debug("zap logger debug level enabled")
+	
+	logger := &Logger{
+		zapLogger: zapLogger,
+		config:    c,
+	}
+	
+	// 如果是默认实例，更新全局变量
+	if defaultLogger == nil {
+		defaultLogger = logger
+	}
+	
+	return logger
+}
+
+// New 创建一个新的日志实例
+func New() *Config {
+	return &Config{
+		stdoutConfig: &StdoutConfig{
+			level: DebugLevel,
+		},
+		rollingConfig: &FileConfig{
+			encoding: zapcore.EncoderConfig{},
+			logger: &lumberjack.Logger{
+				Filename: getLogFilename(DefaultFilename, ""),
+				MaxSize:  500, // megabytes
+				MaxAge:   30,  // days
+			},
+		},
+		fieldsConfig:          &FieldsConfig{},
+		levelFilterFileConfig: &LevelFilterFileConfig{},
+	}
 }
 
 func Default() *Config {
@@ -108,6 +143,64 @@ func Default() *Config {
 		fieldsConfig:          &FieldsConfig{},
 		levelFilterFileConfig: &LevelFilterFileConfig{},
 	}
+}
+
+// Logger 方法
+func (l *Logger) Trace(msg string, fields ...zap.Field) {
+	l.zapLogger.Debug(msg, fields...)
+}
+
+func (l *Logger) Debug(msg string, fields ...zap.Field) {
+	l.zapLogger.Debug(msg, fields...)
+}
+
+func (l *Logger) Info(msg string, fields ...zap.Field) {
+	l.zapLogger.Info(msg, fields...)
+}
+
+func (l *Logger) Warn(msg string, fields ...zap.Field) {
+	l.zapLogger.Warn(msg, fields...)
+}
+
+func (l *Logger) Error(msg string, fields ...zap.Field) {
+	l.zapLogger.Error(msg, fields...)
+}
+
+func (l *Logger) Fatal(msg string, fields ...zap.Field) {
+	l.zapLogger.Fatal(msg, fields...)
+}
+
+func (l *Logger) Panic(msg string, fields ...zap.Field) {
+	l.zapLogger.Panic(msg, fields...)
+}
+
+func (l *Logger) Debugf(template string, args ...any) {
+	l.zapLogger.Sugar().Debugf(template, args...)
+}
+
+func (l *Logger) Infof(template string, args ...any) {
+	l.zapLogger.Sugar().Infof(template, args...)
+}
+
+func (l *Logger) Warnf(template string, args ...any) {
+	l.zapLogger.Sugar().Warnf(template, args...)
+}
+
+func (l *Logger) Errorf(template string, args ...any) {
+	l.zapLogger.Sugar().Errorf(template, args...)
+}
+
+func (l *Logger) Fatalf(template string, args ...any) {
+	l.zapLogger.Sugar().Fatalf(template, args...)
+}
+
+func (l *Logger) Panicf(template string, args ...any) {
+	l.zapLogger.Sugar().Panicf(template, args...)
+}
+
+// ZapLogger 暴露底层的 zap.Logger
+func (l *Logger) ZapLogger() *zap.Logger {
+	return l.zapLogger
 }
 
 func (c *Config) WithFilename(filename string) *Config {
