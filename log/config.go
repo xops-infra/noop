@@ -94,17 +94,17 @@ func (c *Config) Init() *Logger {
 		zap.AddCallerSkip(1),
 		zap.AddStacktrace(zap.ErrorLevel),
 	)
-	
+
 	logger := &Logger{
 		zapLogger: zapLogger,
 		config:    c,
 	}
-	
+
 	// 如果是默认实例，更新全局变量
 	if defaultLogger == nil {
 		defaultLogger = logger
 	}
-	
+
 	return logger
 }
 
